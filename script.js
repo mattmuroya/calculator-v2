@@ -133,6 +133,7 @@ function deselectOperators() { // helper function to remove .selected style from
 const signBtn = document.querySelector('button.sign');
 
 signBtn.addEventListener('click', () => { // simple sign reverse on current display value;
+  if (calculation.awaitingValueB) return;
   display.textContent = display.textContent * -1;
 });
 
