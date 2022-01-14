@@ -91,9 +91,13 @@ operatorBtns.forEach(button => {
 
     }
     
+    if (button.value !== 'equals') {
+      calculation.operator = button.value;
+    } 
+
     calculation.awaitingValueB = true;
-    calculation.operator = button.value;
-    
+
+
     console.table(calculation);
   });
 });
