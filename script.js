@@ -80,9 +80,7 @@ operatorBtns.forEach(button => {
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
       display.textContent = roundOff(calculation.evaluate(), 8);
-    } else 
-
-    if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
+    } else if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
       if (calculation.valueA === null) { // check if valueA is currently empty
         calculation.valueA = parseFloat(display.textContent); // if so then put the current display value in A
       } else {
@@ -90,9 +88,7 @@ operatorBtns.forEach(button => {
         calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
         display.textContent = calculation.valueA; // display the result in A
 
-        // Experimental
-        calculation.lastOperand = calculation.valueB;
-
+        calculation.lastOperand = calculation.valueB; // before exiting the calculation, store the last operand
       }
     }
 
@@ -152,4 +148,50 @@ deleteBtn.addEventListener('click', () => {
 function roundOff(num, places) {
   const x = Math.pow(10,places);
   return Math.round(num * x) / x;
+}
+
+// just for fun
+
+// Make the DIV element draggable:
+dragElement(document.getElementById('calculator'));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById('calculator-top')) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById('calculator-top').onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 }

@@ -155,3 +155,15 @@ button.operator:active {
 .add {
   grid-area: 4 / 4
 }
+
+/* just for fun */
+
+#calculator {
+  position: absolute;
+  /* z-index: 9; */
+}
+
+#calculator-top {
+  cursor: move;
+  /* z-index: 10; */
+}
