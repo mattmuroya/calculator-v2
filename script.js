@@ -76,7 +76,6 @@ operatorBtns.forEach(button => {
     if (button.value !== 'equals') button.classList.add('selected'); // add the .selected style to the operator (except for the equals button)
 
     if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
-      console.table(calculation);
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
       display.textContent = roundOff(calculation.evaluate(), 8);
