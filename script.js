@@ -79,18 +79,35 @@ operatorBtns.forEach(button => {
       calculation.operator = null;
       return;
     }
+
+    if (display.textContent === 'OVERFLOW') {
+      calculation.valueA = null;
+      calculation.valueB = null;
+      calculation.operator = null;
+      calculation.lastOperand = null;
+      return;
+    }
     
     if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
-      display.textContent = roundOff(calculation.evaluate(), 8);
+      let result = calculation.evaluate();
+      if (result > 999999999999) {
+        display.textContent = "OVERFLOW";
+      } else {
+        display.textContent = roundOff(result, 8);
+      }
     } else if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
       if (calculation.valueA === null) { // check if valueA is currently empty
         calculation.valueA = parseFloat(display.textContent); // if so then put the current display value in A
       } else {
         calculation.valueB = parseFloat(display.textContent); // if there is something in A already, then put current display value in B
         calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
-        display.textContent = calculation.valueA; // display the result in A
+        if (calculation.valueA > 999999999999) {
+          display.textContent = "OVERFLOW";
+        } else {
+          display.textContent = calculation.valueA; // display the result in A
+        }
 
         calculation.lastOperand = calculation.valueB; // before exiting the calculation, store the last operand
       }
@@ -123,7 +140,9 @@ signBtn.addEventListener('click', () => { // simple sign reverse on current disp
 
 const allClearBtn = document.querySelector('button.all-clear');
 
-allClearBtn.addEventListener('click', () => { // reset all values 
+allClearBtn.addEventListener('click', resetAllValues);
+
+function resetAllValues() { // reset all values 
   deselectOperators();
   display.textContent = 0;
   calculation.valueA = null;
@@ -132,15 +151,17 @@ allClearBtn.addEventListener('click', () => { // reset all values
   calculation.lastOperand == null;
   calculation.awaitingValueB = false;
   calculation.finalized = false;
-});
+};
 
 // delete button
 
 const deleteBtn = document.querySelector('button.delete');
 
 deleteBtn.addEventListener('click', () => {
+  if (display.textContent === 'OVERFLOW' || display.textContent === 'NaN') {
+    resetAllValues();
+  }
   let lengthWithoutNeg = display.textContent.replace(/[-.]/g, '').length;
-  console.log(lengthWithoutNeg);
   if (calculation.awaitingValueB) { // prevent deletion if an operator has already been selected
     return;
   } else if (lengthWithoutNeg === 1) {
