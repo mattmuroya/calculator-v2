@@ -152,6 +152,8 @@ function roundOff(num, places) {
 
 // just for fun
 
+// https://www.w3schools.com/howto/howto_js_draggable.asp
+
 // Make the DIV element draggable:
 dragElement(document.getElementById('calculator'));
 
