@@ -48,9 +48,9 @@ numeralBtns.forEach(button => {
       calculation.awaitingValueB = false; // no longer awaiting B
     }
     if (calculation.finalized) { // if the equals button just been pressed
-      calculation.valueA = null; // reset all values on next numeral input
-      calculation.valueB = null;
-      calculation.lastResult = null;
+      //calculation.valueA = null; // reset display on next numeral input
+      //calculation.valueB = null;
+      //calculation.lastResult = null;
       display.textContent = 0;
       calculation.finalized = false;
     }
@@ -80,10 +80,12 @@ operatorBtns.forEach(button => {
     if (button.value !== 'equals') button.classList.add('selected');
 
     if (!calculation.awaitingValueB) {
-
+      console.log('1');
       if (calculation.valueA === null) {
+        console.log('a null');
         calculation.valueA = parseFloat(display.textContent);
       } else {
+        console.log('else');
         calculation.valueB = parseFloat(display.textContent);
         calculation.valueA = calculation.evaluate();
         display.textContent = calculation.valueA;
@@ -92,10 +94,16 @@ operatorBtns.forEach(button => {
     }
     
     if (button.value !== 'equals') {
+      console.log('now awaitng b with new operator');
       calculation.operator = button.value;
-    } 
-
     calculation.awaitingValueB = true;
+  } else if (button.value === 'equals') {
+    calculation.valueA = null;
+    calculation.valueB = null;
+    calculation.finalized = true;
+  }
+
+    
 
 
     console.table(calculation);
