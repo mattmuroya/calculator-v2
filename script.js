@@ -22,9 +22,9 @@ function operate(a, b, operator) {
 // initialize the calculation object
 
 const calculation = {
-  lastResult: null,
   valueA: null,
   valueB: null,
+  lastOperand: null,
   operator: null,
   awaitingValueB: false,
   finalized: false,
@@ -48,18 +48,15 @@ numeralBtns.forEach(button => {
       calculation.awaitingValueB = false; // no longer awaiting B
     }
     if (calculation.finalized) { // if the equals button just been pressed
-      //calculation.valueA = null; // reset display on next numeral input
-      //calculation.valueB = null;
-      //calculation.lastResult = null;
-      display.textContent = 0;
+      calculation.lastOperand = null; // clear the lastOperand value after entering new digits
+      display.textContent = 0; // reset display on next numeral input
       calculation.finalized = false;
     }
     appendInput(button);
-    console.table(calculation);
   });
 });
 
-function appendInput(button) {
+function appendInput(button) { // helper function to append new inputs to the display up until 12 digits
   if (button.value === '.' && display.textContent.includes('.')) return;
   if (display.textContent.replace(/[-.]/g, '').length >= 12) return;
   if (display.textContent === '0' && button.value !== '.') {
@@ -72,41 +69,41 @@ function appendInput(button) {
 // operator buttons
 
 const operatorBtns = document.querySelectorAll('button.operator, button.equals');
+
 operatorBtns.forEach(button => {
   button.addEventListener('click', () => {
+    deselectOperators(); // clear styles from any currently selected operator button
+    if (button.value !== 'equals') button.classList.add('selected'); // add the .selected style to the operator (except for the equals button)
 
-    deselectOperators();
+    if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
+      console.table(calculation);
+      calculation.valueA = parseFloat(display.textContent);
+      calculation.valueB = calculation.lastOperand;
+      display.textContent = roundOff(calculation.evaluate(), 8);
+    } else 
 
-    if (button.value !== 'equals') button.classList.add('selected');
-
-    if (!calculation.awaitingValueB) {
-      console.log('1');
-      if (calculation.valueA === null) {
-        console.log('a null');
-        calculation.valueA = parseFloat(display.textContent);
+    if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
+      if (calculation.valueA === null) { // check if valueA is currently empty
+        calculation.valueA = parseFloat(display.textContent); // if so then put the current display value in A
       } else {
-        console.log('else');
-        calculation.valueB = parseFloat(display.textContent);
-        calculation.valueA = calculation.evaluate();
-        display.textContent = calculation.valueA;
+        calculation.valueB = parseFloat(display.textContent); // if there is something in A already, then put current display value in B
+        calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
+        display.textContent = calculation.valueA; // display the result in A
+
+        // Experimental
+        calculation.lastOperand = calculation.valueB;
+
       }
-
     }
-    
-    if (button.value !== 'equals') {
-      console.log('now awaitng b with new operator');
-      calculation.operator = button.value;
-    calculation.awaitingValueB = true;
-  } else if (button.value === 'equals') {
-    calculation.valueA = null;
-    calculation.valueB = null;
-    calculation.finalized = true;
-  }
 
-    
-
-
-    console.table(calculation);
+    if (button.value !== 'equals') { // for any operand other than equals
+      calculation.operator = button.value; // set the new operator
+      calculation.awaitingValueB = true; // and signal that the calc is awaiting input for another operand
+    } else if (button.value === 'equals') { // if the button pressed was equals button
+      calculation.valueA = null; // then reset all the operand values
+      calculation.valueB = null; // but leave the last operator
+      calculation.finalized = true; // and indicate that this is a finalized answer so that the display will clear on additional numeral input
+    }
   });
 });
 
@@ -117,6 +114,7 @@ function deselectOperators() {
 // sign button
 
 const signBtn = document.querySelector('button.sign');
+
 signBtn.addEventListener('click', () => {
   display.textContent = display.textContent * -1;
 });
@@ -128,30 +126,27 @@ const allClearBtn = document.querySelector('button.all-clear');
 allClearBtn.addEventListener('click', () => {
   deselectOperators();
   display.textContent = 0;
-  calculation.lastResult = null;
   calculation.valueA = null;
   calculation.valueB = null;
   calculation.operator = null;
   calculation.awaitingValueB = false;
   calculation.finalized = false;
-  console.table(calculation);
 });
 
 // delete button
 
 const deleteBtn =  document.querySelector('button.delete');
 
-// equals button - functions like the other operators but 'finalizes' the result.
+deleteBtn.addEventListener('click', () => {
+  if (calculation.awaitingValueB) { // prevent deletion if operator has already been selected
+    return;
+  } else if (display.textContent.length === 1) {
+    display.textContent = 0;
+  } else {
+    display.textContent = display.textContent.slice(0, display.textContent.length - 1);
+  }
+});
 
-// const equalsBtn = document.querySelector('button.equals');
-
-// equalsBtn.addEventListener('click', () => {
-
-
-
-//   calculation.finalized = true;
-//   console.table(calculation);
-// });
 
 // rounding function
 function roundOff(num, places) {
