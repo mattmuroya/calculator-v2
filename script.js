@@ -75,6 +75,11 @@ operatorBtns.forEach(button => {
     deselectOperators(); // clear styles from any currently selected operator button
     if (button.value !== 'equals') button.classList.add('selected'); // add the .selected style to the operator (except for the equals button)
 
+    if (calculation.awaitingValueB && button.value === 'equals') {
+      calculation.operator = null;
+      return;
+    }
+    
     if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
