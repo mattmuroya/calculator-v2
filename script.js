@@ -24,8 +24,8 @@ function operate(a, b, operator) {
 const calculation = {
   valueA: null,
   valueB: null,
-  lastOperand: null,
   operator: null,
+  lastOperand: null,
   awaitingValueB: false,
   finalized: false,
   evaluate: function () {
@@ -107,7 +107,7 @@ operatorBtns.forEach(button => {
   });
 });
 
-function deselectOperators() {
+function deselectOperators() { // helper function to remove .selected style from operators after executing the calculation
   operatorBtns.forEach(button => button.classList.remove('selected'));
 }
 
@@ -115,7 +115,7 @@ function deselectOperators() {
 
 const signBtn = document.querySelector('button.sign');
 
-signBtn.addEventListener('click', () => {
+signBtn.addEventListener('click', () => { // simple sign reverse on current display value;
   display.textContent = display.textContent * -1;
 });
 
@@ -123,23 +123,24 @@ signBtn.addEventListener('click', () => {
 
 const allClearBtn = document.querySelector('button.all-clear');
 
-allClearBtn.addEventListener('click', () => {
+allClearBtn.addEventListener('click', () => { // reset all values 
   deselectOperators();
   display.textContent = 0;
   calculation.valueA = null;
   calculation.valueB = null;
   calculation.operator = null;
+  calculation.lastOperand == null;
   calculation.awaitingValueB = false;
   calculation.finalized = false;
 });
 
 // delete button
 
-const deleteBtn =  document.querySelector('button.delete');
+const deleteBtn = document.querySelector('button.delete');
 
 deleteBtn.addEventListener('click', () => {
-  if (calculation.awaitingValueB) { // prevent deletion if operator has already been selected
-    return;
+  if (calculation.awaitingValueB) { // delete last digit entered from display
+    return; // prevent deletion if an operator has already been selected
   } else if (display.textContent.length === 1) {
     display.textContent = 0;
   } else {
@@ -147,8 +148,7 @@ deleteBtn.addEventListener('click', () => {
   }
 });
 
-
-// rounding function
+// helper function to truncate long floats
 function roundOff(num, places) {
   const x = Math.pow(10,places);
   return Math.round(num * x) / x;
