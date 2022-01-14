@@ -74,8 +74,10 @@ function appendInput(button) {
 const operatorBtns = document.querySelectorAll('button.operator, button.equals');
 operatorBtns.forEach(button => {
   button.addEventListener('click', () => {
+
     deselectOperators();
-    button.classList.add('selected');
+
+    if (button.value !== 'equals') button.classList.add('selected');
 
     if (!calculation.awaitingValueB) {
 
@@ -91,6 +93,7 @@ operatorBtns.forEach(button => {
     
     calculation.awaitingValueB = true;
     calculation.operator = button.value;
+    
     console.table(calculation);
   });
 });
@@ -137,3 +140,9 @@ const deleteBtn =  document.querySelector('button.delete');
 //   calculation.finalized = true;
 //   console.table(calculation);
 // });
+
+// rounding function
+function roundOff(num, places) {
+  const x = Math.pow(10,places);
+  return Math.round(num * x) / x;
+}
