@@ -134,9 +134,11 @@ allClearBtn.addEventListener('click', () => { // reset all values
 const deleteBtn = document.querySelector('button.delete');
 
 deleteBtn.addEventListener('click', () => {
-  if (calculation.awaitingValueB) { // delete last digit entered from display
-    return; // prevent deletion if an operator has already been selected
-  } else if (display.textContent.length === 1) {
+  let lengthWithoutNeg = display.textContent.replace(/[-.]/g, '').length;
+  console.log(lengthWithoutNeg);
+  if (calculation.awaitingValueB) { // prevent deletion if an operator has already been selected
+    return;
+  } else if (lengthWithoutNeg === 1) {
     display.textContent = 0;
   } else {
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
