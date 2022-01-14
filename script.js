@@ -15,7 +15,7 @@ function operate(a, b, operator) {
       return a / b;
       break;
     default:
-      return 'ERROR';
+      return calculation.valueA;
   }
 }
 
@@ -71,10 +71,27 @@ function appendInput(button) {
 
 // operator buttons
 
-const operatorBtns = document.querySelectorAll('button.operator');
+const operatorBtns = document.querySelectorAll('button.operator, button.equals');
 operatorBtns.forEach(button => {
   button.addEventListener('click', () => {
+    deselectOperators();
+    button.classList.add('selected');
+
+    if (!calculation.awaitingValueB) {
+
+      if (calculation.valueA === null) {
+        calculation.valueA = parseFloat(display.textContent);
+      } else {
+        calculation.valueB = parseFloat(display.textContent);
+        calculation.valueA = calculation.evaluate();
+        display.textContent = calculation.valueA;
+      }
+
+    }
     
+    calculation.awaitingValueB = true;
+    calculation.operator = button.value;
+    console.table(calculation);
   });
 });
 
@@ -111,8 +128,12 @@ const deleteBtn =  document.querySelector('button.delete');
 
 // equals button - functions like the other operators but 'finalizes' the result.
 
-const equalsBtn = document.querySelector('button.equals');
+// const equalsBtn = document.querySelector('button.equals');
 
-equalsBtn.addEventListener('click', () => {
-  
-});
+// equalsBtn.addEventListener('click', () => {
+
+
+
+//   calculation.finalized = true;
+//   console.table(calculation);
+// });
