@@ -68,7 +68,7 @@ function appendInput(button) { // helper function to append new inputs to the di
 
 // operator buttons
 
-const operatorBtns = document.querySelectorAll('button.operator, button.equals');
+const operatorBtns = document.querySelectorAll('button.operator');
 
 operatorBtns.forEach(button => {
   button.addEventListener('click', () => {
