@@ -101,16 +101,18 @@ const operatorBtns = document.querySelectorAll('button.operator');
 
 operatorBtns.forEach(button => {
   button.addEventListener('click', () => {
+
+    if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯') {
+      resetAllValues();
+      return;
+    }
+
     deselectOperators(); // clear styles from any currently selected operator button
+
     if (button.value !== 'equals') button.classList.add('selected'); // add the .selected style to the operator (except for the equals button)
 
     if (calculation.awaitingValueB && button.value === 'equals') {
       calculation.operator = null;
-      return;
-    }
-
-    if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯') {
-      resetAllValues();
       return;
     }
 
@@ -175,6 +177,7 @@ function deselectOperators() { // helper function to remove .selected style from
 const signBtn = document.querySelector('button.sign');
 
 signBtn.addEventListener('click', () => { // simple sign reverse on current display value;
+  resetIfError();
   if (calculation.awaitingValueB) return;
   display.textContent = display.textContent * -1;
 });
@@ -196,14 +199,17 @@ function resetAllValues() { // reset all values
   calculation.finalized = false;
 };
 
+function resetIfError() {
+  if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯')
+    resetAllValues();
+}
+
 // delete button
 
 const deleteBtn = document.querySelector('button.delete');
 
 deleteBtn.addEventListener('click', () => {
-  if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯') {
-    resetAllValues();
-  }
+  resetIfError();
   let lengthWithoutNeg = display.textContent.replace(/[-.]/g, '').length;
   if (calculation.awaitingValueB) { // prevent deletion if an operator has already been selected
     return;
@@ -215,10 +221,10 @@ deleteBtn.addEventListener('click', () => {
 });
 
 // helper function to truncate long floats
-function roundOff(num, places) {
-  const x = Math.pow(10,places);
-  return Math.round(num * x) / x;
-}
+// function roundOff(num, places) {
+//   const x = Math.pow(10,places);
+//   return Math.round(num * x) / x;
+// }
 
 // just for fun
 
