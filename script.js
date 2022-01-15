@@ -30,7 +30,6 @@ const calculation = {
   finalized: false,
   evaluate: function () {
     let result = operate(this.valueA, this.valueB, this.operator);
-    console.log('log');
     if (result === Infinity || result === -Infinity || result !== result) { // checks for NaN since NaN is unequal to itself
       return '¯\\_(ツ)_/¯';
     } else if (result > 999999999999) {
@@ -46,23 +45,6 @@ const calculation = {
     }
   }
 };
-// test cases
-
-// calculation.valueA = 'yes';
-// calculation.valueB = 0;
-// calculation.operator = 'divide';
-
-// calculation.valueA = 134523523;
-// calculation.valueB = 3.1415926535897932384626433;
-// calculation.operator = 'multiply';
-
-// calculation.valueA = 314159265358.97932384626433;
-// calculation.valueB = 100;
-// calculation.operator = 'add';
-
-// console.log(calculation.valueA, calculation.valueB, calculation.evaluate());
-
-// display
 
 const display = document.querySelector('.calculator-display');
 
