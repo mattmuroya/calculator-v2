@@ -29,9 +29,38 @@ const calculation = {
   awaitingValueB: false,
   finalized: false,
   evaluate: function () {
-    return operate(this.valueA, this.valueB, this.operator);
+    let result = operate(this.valueA, this.valueB, this.operator);
+    console.log('log');
+    if (result === Infinity || result === -Infinity || result !== result) { // checks for NaN since NaN is unequal to itself
+      return '¯\\_(ツ)_/¯';
+    } else if (result > 999999999999) {
+      return "OVERFLOW";
+    } else if (result.toString().includes('.') && result.toString().length > 12) {
+      if (result.toString().charAt(12) === '.') {
+        return result.toString().slice(0, 12);
+      } else {
+        return result.toString().slice(0, 13);
+      }
+    } else {
+      return result;
+    }
   }
 };
+// test cases
+
+// calculation.valueA = 'yes';
+// calculation.valueB = 0;
+// calculation.operator = 'divide';
+
+// calculation.valueA = 134523523;
+// calculation.valueB = 3.1415926535897932384626433;
+// calculation.operator = 'multiply';
+
+// calculation.valueA = 314159265358.97932384626433;
+// calculation.valueB = 100;
+// calculation.operator = 'add';
+
+// console.log(calculation.valueA, calculation.valueB, calculation.evaluate());
 
 // display
 
@@ -80,34 +109,47 @@ operatorBtns.forEach(button => {
       return;
     }
 
-    if (display.textContent === 'OVERFLOW') {
-      calculation.valueA = null;
-      calculation.valueB = null;
-      calculation.operator = null;
-      calculation.lastOperand = null;
+    if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯') {
+      resetAllValues();
       return;
     }
+
+    // if (display.textContent === 'OVERFLOW') {
+    //   calculation.valueA = null;
+    //   calculation.valueB = null;
+    //   calculation.operator = null;
+    //   calculation.lastOperand = null;
+    //   return;
+    // }
     
     if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
-      let result = calculation.evaluate();
-      if (result > 999999999999) {
-        display.textContent = "OVERFLOW";
-      } else {
-        display.textContent = roundOff(result, 8);
-      }
+
+
+      // let result = calculation.evaluate();
+      // if (result > 999999999999) {
+      //   display.textContent = "OVERFLOW";
+      // } else {
+      //   display.textContent = roundOff(result, 8);
+      // }
+      display.textContent = calculation.evaluate();
+
+      
     } else if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
       if (calculation.valueA === null) { // check if valueA is currently empty
         calculation.valueA = parseFloat(display.textContent); // if so then put the current display value in A
       } else {
         calculation.valueB = parseFloat(display.textContent); // if there is something in A already, then put current display value in B
-        calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
-        if (calculation.valueA > 999999999999) {
-          display.textContent = "OVERFLOW";
-        } else {
-          display.textContent = calculation.valueA; // display the result in A
-        }
+
+        // calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
+        // if (calculation.valueA > 999999999999) {
+        //   display.textContent = "OVERFLOW";
+        // } else {
+        //   display.textContent = calculation.valueA; // display the result in A
+        // }
+        calculation.valueA = calculation.evaluate();
+        display.textContent = calculation.valueA;
 
         calculation.lastOperand = calculation.valueB; // before exiting the calculation, store the last operand
       }
@@ -159,7 +201,7 @@ function resetAllValues() { // reset all values
 const deleteBtn = document.querySelector('button.delete');
 
 deleteBtn.addEventListener('click', () => {
-  if (display.textContent === 'OVERFLOW' || display.textContent === 'NaN') {
+  if (display.textContent === 'OVERFLOW' || display.textContent === '¯\\_(ツ)_/¯') {
     resetAllValues();
   }
   let lengthWithoutNeg = display.textContent.replace(/[-.]/g, '').length;
