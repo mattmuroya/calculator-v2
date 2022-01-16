@@ -30,7 +30,8 @@ const calculation = {
   finalized: false,
   evaluate: function () {
     let result = operate(this.valueA, this.valueB, this.operator);
-    if (result === Infinity || result === -Infinity || result !== result) { // checks for NaN since NaN is unequal to itself
+    if (result === Infinity || result === -Infinity || result !== result) {
+      // (result !== result) checks for NaN since NaN is unequal to itself
       return '¯\\_(ツ)_/¯';
     } else if (result > 999999999999) {
       return "OVERFLOW";
@@ -54,20 +55,20 @@ const numeralBtns = document.querySelectorAll('button.numeral');
 
 numeralBtns.forEach(button => {
   button.addEventListener('click', () => {
-    if (calculation.awaitingValueB) { // if operator button has just been set
-      display.textContent = 0; // reset the display before appending input
-      calculation.awaitingValueB = false; // no longer awaiting B
+    if (calculation.awaitingValueB) {
+      display.textContent = 0;
+      calculation.awaitingValueB = false;
     }
-    if (calculation.finalized) { // if the equals button just been pressed
-      calculation.lastOperand = null; // clear the lastOperand value after entering new digits
-      display.textContent = 0; // reset display on next numeral input
+    if (calculation.finalized) {
+      calculation.lastOperand = null;
+      display.textContent = 0;
       calculation.finalized = false;
     }
     appendInput(button);
   });
 });
 
-function appendInput(button) { // helper function to append new inputs to the display up until 12 digits
+function appendInput(button) {
   if (button.value === '.' && display.textContent.includes('.')) return;
   if (display.textContent.replace(/[-.]/g, '').length >= 12) return;
   if (display.textContent === '0' && button.value !== '.') {
@@ -89,68 +90,46 @@ operatorBtns.forEach(button => {
       return;
     }
 
-    deselectOperators(); // clear styles from any currently selected operator button
+    deselectOperators();
 
-    if (button.value !== 'equals') button.classList.add('selected'); // add the .selected style to the operator (except for the equals button)
+    if (button.value !== 'equals') button.classList.add('selected');
 
     if (calculation.awaitingValueB && button.value === 'equals') {
       calculation.operator = null;
       return;
     }
-
-    // if (display.textContent === 'OVERFLOW') {
-    //   calculation.valueA = null;
-    //   calculation.valueB = null;
-    //   calculation.operator = null;
-    //   calculation.lastOperand = null;
-    //   return;
-    // }
     
-    if (button.value === 'equals' && calculation.finalized) { // if you're repeating the equals button without entering any digits in between to reset finalization
+    // repeat last calculation on subsequent presses of equals button
+    if (button.value === 'equals' && calculation.finalized) {
       calculation.valueA = parseFloat(display.textContent);
       calculation.valueB = calculation.lastOperand;
-
-
-      // let result = calculation.evaluate();
-      // if (result > 999999999999) {
-      //   display.textContent = "OVERFLOW";
-      // } else {
-      //   display.textContent = roundOff(result, 8);
-      // }
       display.textContent = calculation.evaluate();
 
-      
-    } else if (!calculation.awaitingValueB) { // if you haven't selected an operator yet OR you have selected one, but already entered a valueB, so calc is no longer waiting for it
-      if (calculation.valueA === null) { // check if valueA is currently empty
-        calculation.valueA = parseFloat(display.textContent); // if so then put the current display value in A
+      // either store valueA or evaluate if (valueA)
+    } else if (!calculation.awaitingValueB) {
+      if (calculation.valueA === null) {
+        calculation.valueA = parseFloat(display.textContent);
       } else {
-        calculation.valueB = parseFloat(display.textContent); // if there is something in A already, then put current display value in B
-
-        // calculation.valueA = roundOff(calculation.evaluate(), 8); // take A and B, evaluate with the selected operator, and put the result in A
-        // if (calculation.valueA > 999999999999) {
-        //   display.textContent = "OVERFLOW";
-        // } else {
-        //   display.textContent = calculation.valueA; // display the result in A
-        // }
+        calculation.valueB = parseFloat(display.textContent);
         calculation.valueA = calculation.evaluate();
         display.textContent = calculation.valueA;
-
-        calculation.lastOperand = calculation.valueB; // before exiting the calculation, store the last operand
+        calculation.lastOperand = calculation.valueB;
       }
     }
 
-    if (button.value !== 'equals') { // for any operand other than equals
-      calculation.operator = button.value; // set the new operator
-      calculation.awaitingValueB = true; // and signal that the calc is awaiting input for another operand
-    } else if (button.value === 'equals') { // if the button pressed was equals button
-      calculation.valueA = null; // then reset all the operand values
-      calculation.valueB = null; // but leave the last operator
-      calculation.finalized = true; // and indicate that this is a finalized answer so that the display will clear on additional numeral input
+    // on operator, prep for next input; on equals, finalize
+    if (button.value !== 'equals') {
+      calculation.operator = button.value;
+      calculation.awaitingValueB = true;
+    } else if (button.value === 'equals') {
+      calculation.valueA = null;
+      calculation.valueB = null;
+      calculation.finalized = true;
     }
   });
 });
 
-function deselectOperators() { // helper function to remove .selected style from operators after executing the calculation
+function deselectOperators() {
   operatorBtns.forEach(button => button.classList.remove('selected'));
 }
 
@@ -158,7 +137,7 @@ function deselectOperators() { // helper function to remove .selected style from
 
 const signBtn = document.querySelector('button.sign');
 
-signBtn.addEventListener('click', () => { // simple sign reverse on current display value;
+signBtn.addEventListener('click', () => {
   resetIfError();
   if (calculation.awaitingValueB) return;
   display.textContent = display.textContent * -1;
@@ -170,7 +149,7 @@ const allClearBtn = document.querySelector('button.all-clear');
 
 allClearBtn.addEventListener('click', resetAllValues);
 
-function resetAllValues() { // reset all values 
+function resetAllValues() {
   deselectOperators();
   display.textContent = 0;
   calculation.valueA = null;
@@ -193,7 +172,7 @@ const deleteBtn = document.querySelector('button.delete');
 deleteBtn.addEventListener('click', () => {
   resetIfError();
   let lengthWithoutNeg = display.textContent.replace(/[-.]/g, '').length;
-  if (calculation.awaitingValueB) { // prevent deletion if an operator has already been selected
+  if (calculation.awaitingValueB) {
     return;
   } else if (lengthWithoutNeg === 1) {
     display.textContent = 0;
@@ -201,12 +180,6 @@ deleteBtn.addEventListener('click', () => {
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
   }
 });
-
-// helper function to truncate long floats
-// function roundOff(num, places) {
-//   const x = Math.pow(10,places);
-//   return Math.round(num * x) / x;
-// }
 
 // just for fun
 
